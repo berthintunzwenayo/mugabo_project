@@ -16,9 +16,11 @@ float intercept=0.0;
 float slope=0.0405;
 float current_Volts;
 float sumOfCurrent = 0;
+float sumOfVoltage = 0;
 
 int Sensor=0;
 int counter=1;
+int checkSum=0;
 
 unsigned long period=1000;
 unsigned long previousMillis=0;
@@ -28,7 +30,7 @@ noDelay elapseTime(60000, sendData);
 
 char IMEI[15];//serial number
 void sendData(){
-  String msg=String("AT+HTTPPARA=\"URL\",\"http://iotstls.herokuapp.com/add/data?data=861508039275185*" + String(volt()) + "*" + String(computeCurrent())+"*" +String(lightSensor()) + "*1*"+ String(sumOfCurrent*volt())+"\"");
+  String msg=String("AT+HTTPPARA=\"URL\",\"http://iotstls.herokuapp.com/add/data?data=861508039275185*" + String(volt()) + "*" + String(computeCurrent())+"*" +String(lightSensor()) + "*1*"+ String(sumOfCurrent*(sumOfVoltage/(float)checkSum))+"\"");
   Serial.print("sending: ");
   Serial.println(msg);
   GPRS.println("AT+HTTPTERM");//TERMINATE HTTP service
@@ -41,10 +43,8 @@ void sendData(){
   delay(1000);
   readGPRS();
   GPRS.println(msg);
-  //GPRS.println("AT+HTTPPARA=\"URL\",\"http://iotstls.herokuapp.com/add/data?data=86150803927518*250*1*100*1\"");
   delay(1000);
   readGPRS();
-  //connectGSM(msg,"OK",1000);//set parameters of HTTP session
   connectGSM("AT+HTTPACTION=0","+HTTPACTION:0,200",10000);//submit HTTP GET request
   counter++;
   sumOfCurrent = 0;
@@ -56,26 +56,22 @@ void setup() {
   inputStats.setWindowSecs(windowLength);
   //testAT();
   //scanIMEI();
-  //initGSM();
-  //initGPRS();
+  initGSM();
+  initGPRS();
   pinMode(switchPin,OUTPUT);
-  digitalWrite(switchPin,HIGH);
+  digitalWrite(switchPin,HIGH);delay(1000);Serial.println(computeCurrent());
   pinMode(pir_pin,INPUT);
   pinMode(LDR,INPUT);
   pinMode(actuator,OUTPUT);//to switch between different light intensity.
-  //digitalWrite(actuator,HIGH);
+  //digitalWrite(actuator,HIGH);delay(1000);Serial.println(computeCurrent());
 }
 
 void loop() {
-  //volt();
   //elapseTime.fupdate();
   //sensePerson();
   //sumOfCurrent = sumOfCurrent + computeCurrent(currentSensorPin);
-  //testAT();
-  //float a = analogRead(currentSensorPin);
-  //Serial.println(float((a*5000.0)/1024.0));
-  //String msg=String("AT+HTTPPARA=\"URL\",\"http://iotstls.herokuapp.com/add/data?data=861508039275185*" + String(volt()) + "*" + String(computeCurrent())+"*" +String(lightSensor()) + "*1*"+ String(sumOfCurrent*volt())+"\"");
-  Serial.println(volt());
+  //sumOfVoltage = sumOfVoltage + volt();
+  //checkSum++;
   delay(1000);
 }
 void readGPRS()

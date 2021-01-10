@@ -7,7 +7,7 @@ float computeCurrent()
   float iRms = (VRMS * 1000)/scaleFactor;
   return int(iRms);*/
   float analogI = analogRead(currentSensorPin);
-  float current = (analogI*5.0*1000.0/(100.0*1024.0));
+  float current = ((analogI-8)*5.0*1000.0/(100.0*1024.0));
   return current;
 }
 
