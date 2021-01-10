@@ -26,11 +26,11 @@ unsigned long period=1000;
 unsigned long previousMillis=0;
 void scanIMEI();
 void sendData();
-noDelay elapseTime(60000, sendData);
+noDelay elapseTime(120000, sendData);
 
 char IMEI[15];//serial number
 void sendData(){
-  String msg=String("AT+HTTPPARA=\"URL\",\"http://iotstls.herokuapp.com/add/data?data=861508039275185*" + String(volt()) + "*" + String(computeCurrent())+"*" +String(lightSensor()) + "*1*"+ String(sumOfCurrent*(sumOfVoltage/(float)checkSum))+"\"");
+  String msg=String("AT+HTTPPARA=\"URL\",\"http://iotstls.herokuapp.com/add/data?data=345566788*" + String(volt()) + "*" + String(computeCurrent())+"*" +String(lightSensor()) + "*1*"+ String(sumOfCurrent*(sumOfVoltage/(float)checkSum))+"\"");
   Serial.print("sending: ");
   Serial.println(msg);
   GPRS.println("AT+HTTPTERM");//TERMINATE HTTP service
@@ -48,6 +48,7 @@ void sendData(){
   connectGSM("AT+HTTPACTION=0","+HTTPACTION:0,200",10000);//submit HTTP GET request
   counter++;
   sumOfCurrent = 0;
+  sumOfVoltage = 0;
 }
  
 void setup() {
@@ -67,11 +68,11 @@ void setup() {
 }
 
 void loop() {
-  //elapseTime.fupdate();
-  //sensePerson();
-  //sumOfCurrent = sumOfCurrent + computeCurrent(currentSensorPin);
-  //sumOfVoltage = sumOfVoltage + volt();
-  //checkSum++;
+  elapseTime.fupdate();
+  sensePerson();
+  sumOfCurrent = sumOfCurrent + computeCurrent();
+  sumOfVoltage = sumOfVoltage + volt();
+  checkSum++;
   delay(1000);
 }
 void readGPRS()
