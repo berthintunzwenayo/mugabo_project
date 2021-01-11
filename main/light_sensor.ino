@@ -1,6 +1,6 @@
 int lightSensor()
 {
-  float sensorValue=0;
+  /*float sensorValue=0;
   int percentage=0;
   sensorValue=analogRead(LDR);
   if(sensorValue<910)
@@ -9,5 +9,9 @@ int lightSensor()
   sensorValue=920;
   percentage=map(sensorValue,910,920,0,100);
   delay(250);
-  return percentage;
+  return percentage;*/
+  if(motion)
+  return 100;
+  else
+  return 50;
 }

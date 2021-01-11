@@ -22,8 +22,10 @@ int Sensor=0;
 int counter=1;
 int checkSum=0;
 
+bool motion = false;
+uint32_t motionAt=0;
 unsigned long period=1000;
-unsigned long previousMillis=0;
+uint32_t previousMillis=0;
 void scanIMEI();
 void sendData();
 noDelay elapseTime(120000, sendData);
@@ -45,7 +47,8 @@ void sendData(){
   GPRS.println(msg);
   delay(1000);
   readGPRS();
-  connectGSM("AT+HTTPACTION=0","+HTTPACTION:0,200",10000);//submit HTTP GET request
+  GPRS.println("AT+HTTPACTION=0");
+  //connectGSM("AT+HTTPACTION=0","+HTTPACTION:0,200",10000);//submit HTTP GET request
   counter++;
   sumOfCurrent = 0;
   sumOfVoltage = 0;
@@ -60,7 +63,7 @@ void setup() {
   initGSM();
   initGPRS();
   pinMode(switchPin,OUTPUT);
-  digitalWrite(switchPin,HIGH);delay(1000);Serial.println(computeCurrent());
+  digitalWrite(switchPin,HIGH);//delay(1000);Serial.println(computeCurrent());
   pinMode(pir_pin,INPUT);
   pinMode(LDR,INPUT);
   pinMode(actuator,OUTPUT);//to switch between different light intensity.
@@ -70,6 +73,12 @@ void setup() {
 void loop() {
   elapseTime.fupdate();
   sensePerson();
+  if(motion){
+    if((millis()-motionAt)>=60000){
+      digitalWrite(actuator,LOW);
+      motion = false;
+    }
+  }
   sumOfCurrent = sumOfCurrent + computeCurrent();
   sumOfVoltage = sumOfVoltage + volt();
   checkSum++;
